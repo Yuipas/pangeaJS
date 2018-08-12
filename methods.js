@@ -7,7 +7,8 @@ let activation = {
   SIGMOID: function(x, derivative = false) {
     if (derivative == false) {
       return 1 / (1 + exp(-x));
-    } else {
+    }
+    else {
       return x * (1 - x);
     }
   },
@@ -15,7 +16,8 @@ let activation = {
   TANH: function(x, derivative = false) {
     if (derivative == false) {
       return Math.tanh(x);
-    } else {
+    }
+    else {
       return 1 - sq(x);
     }
   },
@@ -23,7 +25,8 @@ let activation = {
   RELU: function(x, derivative = false) {
     if (derivative == false) {
       return Math.max(x, 0);
-    } else {
+    }
+    else {
       return x > 0 ? 1 : 0;
     }
   },
@@ -54,7 +57,8 @@ let losses = {
         cost: cost / a.data.length,
         errors: errors,
       };
-    } else {
+    }
+    else {
       console.log('a & b must be tensors (1d)');
     }
   },
@@ -81,7 +85,8 @@ let losses = {
         cost: cost / a.data.length,
         errors: errors,
       };
-    } else {
+    }
+    else {
       console.log('a & b must be tensors (1d)');
     }
   },
@@ -109,7 +114,8 @@ let losses = {
         cost: cost / a.data.length,
         errors: errors,
       };
-    } else {
+    }
+    else {
       console.log('a & b must be tensors (1d)');
     }
   }
@@ -143,4 +149,54 @@ let learningCurves = {
     return lr = exp(x) / pow(2.8, x);
   }
 
+}
+
+function ArrayEquals(value, other) {
+
+  let type = Object.prototype.toString.call(value);
+
+  if (type !== Object.prototype.toString.call(other)) return false;
+
+  if (['[object Array]', '[object Object]'].indexOf(type) < 0) return false;
+
+  let valueLen = type === '[object Array]' ? value.length : Object.keys(value).length;
+  let otherLen = type === '[object Array]' ? other.length : Object.keys(other).length;
+  if (valueLen !== otherLen) return false;
+
+  let compare = function(item1, item2) {
+
+    let itemType = Object.prototype.toString.call(item1);
+
+    if (['[object Array]', '[object Object]'].indexOf(itemType) >= 0) {
+      if (!ArrayEquals(item1, item2)) return false;
+    }
+
+    else {
+
+      if (itemType !== Object.prototype.toString.call(item2)) return false;
+
+      if (itemType === '[object Function]') {
+        if (item1.toString() !== item2.toString()) return false;
+      }
+      else {
+        if (item1 !== item2) return false;
+      }
+
+    }
+  }
+
+  if (type === '[object Array]') {
+    for (let i = 0; i < valueLen; i++) {
+      if (compare(value[i], other[i]) === false) return false;
+    }
+  }
+  else {
+    for (let key in value) {
+      if (value.hasOwnProperty(key)) {
+        if (compare(value[key], other[key]) === false) return false;
+      }
+    }
+  }
+
+  return true;
 }

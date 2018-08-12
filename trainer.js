@@ -1,7 +1,9 @@
-function Trainer(net, options) {
+function Trainer(net, options = {}) {
   this.net = net;
 
   this.iterations = 0;
+
+  this.lastUpdate = 0;
 
   options = options || {};
 
@@ -9,7 +11,7 @@ function Trainer(net, options) {
   this.costHistory = [];
   this.loss = options.costFunction || losses.meanSquaredError;
 
-  this.learningRate = options.StartlearningRate || 0.05;
+  this.learningRate = options.learningRate || 0.05;
   this.learningCurve = options.learningCurve || learningCurves.static;
 
   this.update = options.update || false;
@@ -21,8 +23,7 @@ function Trainer(net, options) {
 Trainer.prototype = {
 
   getLR: function() {
-    return this.learningRate = this.learningCurve(this.learningRate, this.iterations,
-      this.costHistory);
+    return this.learningRate = this.learningCurve(this.learningRate, this.iterations, this.costHistory);
   },
 
   train: function(I, T) {
@@ -63,7 +64,7 @@ Trainer.prototype = {
     if (this.update) {
       this.updateNetwork();
     }
-    
+
     return {
       iterations: this.iterations,
       ForwardTime: FWRDTime,
@@ -75,6 +76,12 @@ Trainer.prototype = {
 
   updateNetwork: function() {
 
+    let scalar = this.iterations - this.lastUpdate;
+
+    if(scalar === 0) {
+      return;
+    }
+
     this.getLR();
 
     for(let i = 0; i < this.net.network.length; i++) {
@@ -82,17 +89,21 @@ Trainer.prototype = {
 
       if(layer.type !== 'output') {
         let deltas = this.net.network[i].acweightsDeltas;
+        this.net.network[i].weights.div(scalar);
         this.net.network[i].weights.add(deltas);
         this.net.network[i].acweightsDeltas.map(() => 0);
       }
 
       if(layer.type !== 'input') {
         let deltas = this.net.network[i].acbiasDeltas;
+        this.net.network[i].bias.div(scalar);
         this.net.network[i].bias.add(deltas);
         this.net.network[i].acbiasDeltas.map(() => 0);
       }
 
     }
+
+    this.lastUpdate = this.iterations;
   }
 
 }

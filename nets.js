@@ -1,11 +1,10 @@
 let models = {
 
-
   /**
    *  Feedforward Neural Network (see https://en.wikipedia.org/wiki/Feedforward_neural_network).
    */
 
-  FFNN: function() {
+  FNN: function() {
     let layers = Array.prototype.slice.call(arguments);
     let net = new Network(layers);
     net.construct();
@@ -37,13 +36,11 @@ Network.prototype = {
       options = [];
 
       for (let i = 0; i < this.layers.length; i++) {
-        let type = i == 0 ? 'input' : (i == (this.layers.length - 1) ?
-          'output' : 'hidden');
+        let type = i == 0 ? 'input' : (i == (this.layers.length - 1) ? 'output' : 'hidden');
 
         let inf = {
           type: type,
           squash: activation.SIGMOID,
-          // fullyConnected: true
         };
 
         options.push(inf);
